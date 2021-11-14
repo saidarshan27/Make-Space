@@ -1,10 +1,9 @@
-// helper functions
-const getTimeParts = (startTime, endTime) => {
-  return [startTime.split(':'), endTime.split(':')];
-};
+const { getTimeParts } = require('./util');
 
+// helper functions
 const validateIntervalsOf15 = (startTime, endTime) => {
-  const [startTimeParts, endTimeParts] = getTimeParts(startTime, endTime);
+  const startTimeParts = getTimeParts(startTime);
+  const endTimeParts = getTimeParts(endTime);
 
   const [startHour, startMinute] = startTimeParts;
   const [endtHour, endMinute] = endTimeParts;
@@ -18,7 +17,8 @@ const validateIntervalsOf15 = (startTime, endTime) => {
 };
 
 const validateHHMMFormat = (startTime, endTime) => {
-  const [startTimeParts, endTimeParts] = getTimeParts(startTime, endTime);
+  const startTimeParts = getTimeParts(startTime);
+  const endTimeParts = getTimeParts(endTime);
 
   if (startTimeParts.length < 2 || endTimeParts.length < 2) {
     throw new Error('INCORRECT_INPUT');
@@ -36,7 +36,8 @@ const validateHHMMFormat = (startTime, endTime) => {
 };
 
 const validateTimeRange = (startTime, endTime) => {
-  const [startTimeParts, endTimeParts] = getTimeParts(startTime, endTime);
+  const startTimeParts = getTimeParts(startTime);
+  const endTimeParts = getTimeParts(endTime);
 
   const [startHour] = startTimeParts;
   const [endHour] = endTimeParts;

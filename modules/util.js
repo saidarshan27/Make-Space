@@ -1,7 +1,10 @@
 const { once } = require('events');
 const readline = require('readline');
 const fs = require('fs');
-const { validateBookCommand } = require('./validate');
+
+const getTimeParts = (timeString) => {
+  return timeString.split(':');
+};
 
 const getInput = async (path) => {
   const fileStream = fs.createReadStream(path);
@@ -20,26 +23,23 @@ const getInput = async (path) => {
   return inputLines;
 };
 
-const processBookCommand = (command) => {
-  try {
-    validateBookCommand(command);
-  } catch (e) {
-    console.error(e.message);
-  }
+const getCommandParts = (command) => {
+  return command.split(' ');
 };
 
-const processCommand = (command) => {
-  if (command.includes('BOOK')) {
-    processBookCommand(command);
-  }
-  // } else if (type === 'VACANCY') {
-  //   processVacancyCommand(command);
-  // } else {
-  //   throw new Error('INCORRECT_INPUT');
-  // }
+const getUTCTimestamp = (timeString) => {
+  const [hour, minute] = getTimeParts(timeString);
+  const ISOString = new Date().toISOString();
+  const [date] = ISOString.split('T');
+  const [year, month, day] = date.split('-');
+
+  const ms = Date.UTC(year, month - 1, day, hour, minute);
+  return ms;
 };
 
 module.exports = {
   getInput,
-  processCommand,
+  getCommandParts,
+  getUTCTimestamp,
+  getTimeParts,
 };
