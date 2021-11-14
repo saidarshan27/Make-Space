@@ -4,7 +4,7 @@
   "description": "a meeting scheduling system",
   "main": "geektrust.js",
   "scripts": {
-    "test": "jest"
+    "start": "node geektrust.js"
   },
   "author": "sai darshan",
   "license": "ISC",
