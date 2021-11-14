@@ -1,19 +1,17 @@
+const { meetingRooms } = require('../repository/meetingRooms');
 const { getCommandParts, getUTCTimestamp } = require('./util');
+const { getVacancies, getOptimalVacantRoom } = require('./vacany');
 const { validateBookCommand } = require('./validate');
 
-const meetingRooms = {
-  'C-Cave': {
-    capacity: 3,
-    bookings: [],
-  },
-  'D-Tower': {
-    capacity: 7,
-    bookings: [],
-  },
-  'G-Mansion': {
-    capacity: 20,
-    bookings: [],
-  },
+const confirmBooking = (meetingRoomName, startTimestamp, endTimestamp) => {
+  const meetingRoom = meetingRooms[meetingRoomName];
+  const bookingObj = {
+    startTimestamp,
+    endTimestamp,
+  };
+  meetingRoom.bookings.push(bookingObj);
+
+  return meetingRoomName;
 };
 
 const makeBooking = (command) => {
@@ -21,17 +19,16 @@ const makeBooking = (command) => {
   const startTimestamp = getUTCTimestamp(startTime);
   const endTimestamp = getUTCTimestamp(endTime);
 
-  console.log(startTimestamp, endTimestamp);
-  // Object.keys(meetingRooms).forEach((meetingRoom) => {
-  //   if (meetingRoom.capacity >= capacity) {
-  //   }
-  // });
+  const vacancies = getVacancies(meetingRooms, startTimestamp, endTimestamp);
+  const optimalVacantRoom = getOptimalVacantRoom(meetingRooms, vacancies, capacity);
+
+  return confirmBooking(optimalVacantRoom, startTimestamp, endTimestamp);
 };
 
 const processBookCommand = (command) => {
   try {
     validateBookCommand(command);
-    makeBooking(command);
+    console.log(makeBooking(command));
   } catch (e) {
     console.error(e.message);
   }

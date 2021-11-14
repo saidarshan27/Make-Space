@@ -1,4 +1,6 @@
-const { getTimeParts } = require('./util');
+const {
+  getTimeParts, isValidTimeRange, isBetweenWorkingHours, getUTCTimestamp, checkContainment,
+} = require('./util');
 
 // helper functions
 const validateIntervalsOf15 = (startTime, endTime) => {
@@ -42,9 +44,10 @@ const validateTimeRange = (startTime, endTime) => {
   const [startHour] = startTimeParts;
   const [endHour] = endTimeParts;
 
-  const isValidTimeRange = parseInt(endHour, 10) > parseInt(startHour, 10);
+  const validTimeRange = isValidTimeRange(startTime, endTime)
+    && isBetweenWorkingHours(startTime, endTime);
 
-  if (!(isValidTimeRange)) {
+  if (!validTimeRange) {
     throw new Error('INCORRECT_INPUT');
   }
 };
@@ -55,7 +58,7 @@ const validateCapacity = (capacity) => {
   const maximumCapacity = 20;
 
   if (integerCapacity < mininumCapacity || integerCapacity > maximumCapacity) {
-    throw new Error('INCORRECT_INPUT');
+    throw new Error('NO_VACANT_ROOM');
   }
 };
 // exposed funciton
@@ -68,6 +71,15 @@ const validateBookCommand = (command) => {
   validateCapacity(capacity);
 };
 
+const validateVacancyCommand = (command) => {
+  const [type, startTime, endTime, capacity] = command.split(' ');
+
+  validateHHMMFormat(startTime, endTime);
+  validateTimeRange(startTime, endTime);
+  validateIntervalsOf15(startTime, endTime);
+};
+
 module.exports = {
   validateBookCommand,
+  validateVacancyCommand,
 };
