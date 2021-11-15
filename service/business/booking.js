@@ -1,33 +1,23 @@
-const { meetingRooms } = require('../storage/meetingRooms');
+const { confirmMeeting } = require('../dao/meetingRoomsDao');
 const { getCommandParts, getUTCTimestamp } = require('./util');
-const { getVacancies, getOptimalVacantRoom } = require('./vacany');
+const { getOptimalVacantRoom, getVacantRooms } = require('./vacany');
 const { validateBookCommand } = require('./validate');
 
-const confirmBooking = (meetingRoomName, startTimestamp, endTimestamp) => {
-  const meetingRoom = meetingRooms[meetingRoomName];
-  const bookingObj = {
-    startTimestamp,
-    endTimestamp,
-  };
-  meetingRoom.bookings.push(bookingObj);
-
-  return meetingRoomName;
-};
-
-const makeBooking = (command) => {
+const bookMeeting = (command) => {
   const [type, startTime, endTime, capacity] = getCommandParts(command);
   const startTimestamp = getUTCTimestamp(startTime);
   const endTimestamp = getUTCTimestamp(endTime);
 
-  const vacancies = getVacancies(meetingRooms, startTimestamp, endTimestamp);
-  const optimalVacantRoom = getOptimalVacantRoom(meetingRooms, vacancies, capacity);
+  const vacantRooms = getVacantRooms(startTimestamp, endTimestamp);
+  const optimalVacantRoom = getOptimalVacantRoom(vacantRooms, capacity);
 
-  return confirmBooking(optimalVacantRoom, startTimestamp, endTimestamp);
+  const confirmedRoomName = confirmMeeting(optimalVacantRoom.name, startTimestamp, endTimestamp);
+  return confirmedRoomName;
 };
 
 const processBookCommand = (command) => {
   validateBookCommand(command);
-  const bookedRoomName = makeBooking(command);
+  const bookedRoomName = bookMeeting(command);
   console.log(bookedRoomName);
 };
 
