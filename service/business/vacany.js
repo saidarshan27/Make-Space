@@ -1,5 +1,5 @@
 const { NoVacantRoomError } = require('../errors/NoVacantRoomError');
-const { meetingRooms } = require('../repository/meetingRooms');
+const { meetingRooms } = require('../storage/meetingRooms');
 const {
   checkContainment, overlapWithCleaning, getCommandParts, getUTCTimestamp,
 } = require('./util');
