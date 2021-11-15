@@ -51,65 +51,20 @@ const isValidTimeRange = (startTime, endTime) => {
   return validTimeRange;
 };
 
-const checkContainment = (firstTimeRange, secondTimeRange) => {
-  const [fStartTimestamp, fEndTimestamp] = firstTimeRange;
-  const [sStartTimestamp, sEndTimestamp] = secondTimeRange;
+const checkOverlap = (firstTimestampRange, secondTimestampRange) => {
+  const [fStartTimestamp, fEndTimestamp] = firstTimestampRange;
+  const [sStartTimestamp, sEndTimestamp] = secondTimestampRange;
 
   const { max, min } = Math;
 
   return max(fStartTimestamp, sStartTimestamp) < min(fEndTimestamp, sEndTimestamp);
 };
 
-const isBetweenWorkingHours = (startTime, endTime) => {
-  const openingTimestamp = getUTCTimestamp('00:00');
-  const closingTimestamp = getUTCTimestamp('23:45');
-
-  const startTimestamp = getUTCTimestamp(startTime);
-  const endTimestamp = getUTCTimestamp(endTime);
-
-  const firstTimeRange = [openingTimestamp, closingTimestamp];
-  const secondTimeRange = [startTimestamp, endTimestamp];
-
-  const isBetween = checkContainment(firstTimeRange, secondTimeRange);
-
-  return isBetween;
-};
-
-const overlapWithCleaning = (startTimestamp, endTimestamp) => {
-  const cleaningTimings = [
-    {
-      startTimestamp: getUTCTimestamp('09:00'),
-      endTimestamp: getUTCTimestamp('09:15'),
-    },
-    {
-      startTimestamp: getUTCTimestamp('13:15'),
-      endTimestamp: getUTCTimestamp('13:45'),
-    },
-    {
-      startTimestamp: getUTCTimestamp('18:45'),
-      endTimestamp: getUTCTimestamp('19:00.'),
-    },
-  ];
-
-  for (let cleaningTimeIndex = 0; cleaningTimeIndex < cleaningTimings.length; cleaningTimeIndex += 1) {
-    const cleaningTime = cleaningTimings[cleaningTimeIndex];
-
-    const firstTimeRange = [cleaningTime.startTimestamp, cleaningTime.endTimestamp];
-    const secondTimeRange = [startTimestamp, endTimestamp];
-
-    if (checkContainment(firstTimeRange, secondTimeRange)) {
-      throw new Error('NO_VACANT_ROOM');
-    }
-  }
-};
-
 module.exports = {
   getInput,
   getCommandParts,
-  getUTCTimestamp,
   getTimeParts,
+  getUTCTimestamp,
   isValidTimeRange,
-  isBetweenWorkingHours,
-  checkContainment,
-  overlapWithCleaning,
+  checkOverlap,
 };
