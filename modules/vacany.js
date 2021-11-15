@@ -1,3 +1,4 @@
+const { NoVacantRoomError } = require('../errors/NoVacantRoomError');
 const { meetingRooms } = require('../repository/meetingRooms');
 const {
   checkContainment, overlapWithCleaning, getCommandParts, getUTCTimestamp,
@@ -6,7 +7,7 @@ const { validateVacancyCommand } = require('./validate');
 
 const getVacancies = (availableMeetingRooms, startTimestamp, endTimestamp) => {
   if (overlapWithCleaning(startTimestamp, endTimestamp)) {
-    throw new Error('NO_VACANT_ROOM');
+    throw new NoVacantRoomError();
   }
 
   const vacancies = [];
@@ -36,7 +37,7 @@ const getVacancies = (availableMeetingRooms, startTimestamp, endTimestamp) => {
   });
 
   if (vacancies.length === 0) {
-    throw new Error('NO_VACANT_ROOM');
+    throw new NoVacantRoomError();
   }
 
   return vacancies;

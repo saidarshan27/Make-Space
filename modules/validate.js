@@ -1,5 +1,7 @@
+const { IncorrectInputError } = require('../errors/IncorrectInputError');
+const { NoVacantRoomError } = require('../errors/NoVacantRoomError');
 const {
-  getTimeParts, isValidTimeRange, isBetweenWorkingHours, getUTCTimestamp, checkContainment,
+  getTimeParts, isValidTimeRange, isBetweenWorkingHours, getCommandParts,
 } = require('./util');
 
 // helper functions
@@ -14,17 +16,13 @@ const validateIntervalsOf15 = (startTime, endTime) => {
   const integerEndMinute = parseInt(endMinute, 10);
 
   if (integerStartMinute % 15 !== 0 || integerEndMinute % 15 !== 0) {
-    throw new Error('INCORRECT_INPUT');
+    throw new IncorrectInputError();
   }
 };
 
 const validateHHMMFormat = (startTime, endTime) => {
   const startTimeParts = getTimeParts(startTime);
   const endTimeParts = getTimeParts(endTime);
-
-  if (startTimeParts.length < 2 || endTimeParts.length < 2) {
-    throw new Error('INCORRECT_INPUT');
-  }
 
   const [startHour, startMinute] = startTimeParts;
   const [endHour, endMinute] = endTimeParts;
@@ -33,7 +31,7 @@ const validateHHMMFormat = (startTime, endTime) => {
   const isValidMM = (startMinute.length === 2 && endMinute.length === 2);
 
   if (!isValidHH || !isValidMM) {
-    throw new Error('INCORRECT_INPUT');
+    throw new IncorrectInputError();
   }
 };
 
@@ -48,7 +46,7 @@ const validateTimeRange = (startTime, endTime) => {
     && isBetweenWorkingHours(startTime, endTime);
 
   if (!validTimeRange) {
-    throw new Error('INCORRECT_INPUT');
+    throw new IncorrectInputError();
   }
 };
 
@@ -58,12 +56,12 @@ const validateCapacity = (capacity) => {
   const maximumCapacity = 20;
 
   if (integerCapacity < mininumCapacity || integerCapacity > maximumCapacity) {
-    throw new Error('NO_VACANT_ROOM');
+    throw new NoVacantRoomError();
   }
 };
 // exposed funciton
 const validateBookCommand = (command) => {
-  const [type, startTime, endTime, capacity] = command.split(' ');
+  const [type, startTime, endTime, capacity] = getCommandParts(command);
 
   validateHHMMFormat(startTime, endTime);
   validateTimeRange(startTime, endTime);
@@ -72,7 +70,7 @@ const validateBookCommand = (command) => {
 };
 
 const validateVacancyCommand = (command) => {
-  const [type, startTime, endTime, capacity] = command.split(' ');
+  const [type, startTime, endTime] = getCommandParts(command);
 
   validateHHMMFormat(startTime, endTime);
   validateTimeRange(startTime, endTime);
