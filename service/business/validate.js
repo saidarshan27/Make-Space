@@ -1,7 +1,8 @@
 const { IncorrectInputError } = require('../errors/IncorrectInputError');
 const { NoVacantRoomError } = require('../errors/NoVacantRoomError');
+const { isBetweenWorkingHours } = require('./timings');
 const {
-  getTimeParts, isValidTimeRange, isBetweenWorkingHours, getCommandParts,
+  getTimeParts, isValidTimeRange, getCommandParts,
 } = require('./util');
 
 // helper functions
