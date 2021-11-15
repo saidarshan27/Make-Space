@@ -1,6 +1,7 @@
-const { processBookCommand } = require('./modules/booking');
-const { processVacancyCommand } = require('./modules/vacany');
-const { getInput } = require('./modules/util');
+const { processBookCommand } = require('./service/business/booking');
+const { processVacancyCommand } = require('./service/business/vacany');
+const { getInput } = require('./service/business/util');
+
 
 const processCommand = (command) => {
   try {
@@ -8,9 +9,7 @@ const processCommand = (command) => {
       processBookCommand(command);
     } else if (command.includes('VACANCY')) {
       processVacancyCommand(command);
-    } else {
-      throw new Error('INCORRECT_INPUT');
-    }
+    } 
   } catch (e) {
     console.error(e.message);
   }
