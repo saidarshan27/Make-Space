@@ -1,20 +1,22 @@
+const { getAllMeetingRooms } = require('../dao/meetingRoomsDao');
 const { NoVacantRoomError } = require('../errors/NoVacantRoomError');
-const { meetingRooms } = require('../storage/meetingRooms');
+const { overlapWithCleaning } = require('./timings');
 const {
-  checkContainment, overlapWithCleaning, getCommandParts, getUTCTimestamp,
+  checkOverlap, getCommandParts, getUTCTimestamp,
 } = require('./util');
 const { validateVacancyCommand } = require('./validate');
 
-const getVacancies = (availableMeetingRooms, startTimestamp, endTimestamp) => {
+const getVacantRooms = (startTimestamp, endTimestamp) => {
   if (overlapWithCleaning(startTimestamp, endTimestamp)) {
     throw new NoVacantRoomError();
   }
 
-  const vacancies = [];
+  const vacantRooms = [];
+  const meetingRooms = getAllMeetingRooms();
 
-  Object.keys(availableMeetingRooms).forEach((meetingRoom) => {
-    const { bookings } = availableMeetingRooms[meetingRoom];
-    let isVacant = true;
+  meetingRooms.forEach((meetingRoom) => {
+    const bookings  = meetingRoom.bookings;
+    let isBookedForRequestedTime = false;
 
     // loop over bookings
     for (let bookingIndex = 0; bookingIndex < bookings.length; bookingIndex += 1) {
@@ -22,60 +24,53 @@ const getVacancies = (availableMeetingRooms, startTimestamp, endTimestamp) => {
       const bookedStartTimestamp = booking.startTimestamp;
       const bookedEndTimestamp = booking.endTimestamp;
 
-      const firstTimeRange = [bookedStartTimestamp, bookedEndTimestamp];
-      const secondTimeRange = [startTimestamp, endTimestamp];
+      const bookedTimeRange = [bookedStartTimestamp, bookedEndTimestamp];
+      const requestedBookingTimeRange = [startTimestamp, endTimestamp];
 
       // if the any of the booking time overlaps with the provided break and go to next room
-      if (checkContainment(firstTimeRange, secondTimeRange)) {
-        isVacant = false;
+      if (checkOverlap(bookedTimeRange, requestedBookingTimeRange)) {
+        isBookedForRequestedTime = true;
         break;
       }
     }
-    if (isVacant) {
-      vacancies.push(meetingRoom);
+    if (!isBookedForRequestedTime) {
+      vacantRooms.push(meetingRoom);
     }
   });
 
-  if (vacancies.length === 0) {
+  if (vacantRooms.length === 0) {
     throw new NoVacantRoomError();
   }
 
-  return vacancies;
+  return vacantRooms;
 };
 
-const getOptimalVacantRoom = (availableMeetingRooms, vacancies, capacity) => {
-  let optimalVacantRoom;
-
-  for (let vacancyIndex = 0; vacancyIndex < vacancies.length; vacancyIndex += 1) {
-    const vacantRoomName = vacancies[vacancyIndex];
-    const meetingRoom = availableMeetingRooms[vacantRoomName];
-
-    if (meetingRoom.capacity >= capacity) {
-      optimalVacantRoom = vacantRoomName;
-      break;
-    }
-  }
-
-  return optimalVacantRoom;
+const getVacantRoomNames = (vacantRooms) => {     
+  return vacantRooms.map((vacantRoom) => vacantRoom.name);
 };
 
-const printVacancies = (command) => {
+const getOptimalVacantRoom = (vacantRooms, capacity) => {
+  return vacantRooms.find((vacantRoom) => vacantRoom.capacity >= capacity);
+};
+
+const printVacantRoomNames = (command) => {
   const [type, startTime, endTime] = getCommandParts(command);
 
   const startTimestamp = getUTCTimestamp(startTime);
   const endTimestamp = getUTCTimestamp(endTime);
 
-  const vacancies = getVacancies(meetingRooms, startTimestamp, endTimestamp);
-  console.log(vacancies.join(' '));
+  const vacantRooms = getVacantRooms(startTimestamp, endTimestamp);
+  const vacantRoomNames = getVacantRoomNames(vacantRooms);
+  console.log(vacantRoomNames.join(' '));
 };
 
 const processVacancyCommand = (command) => {
   validateVacancyCommand(command);
-  printVacancies(command);
+  printVacantRoomNames(command);
 };
 
 module.exports = {
   processVacancyCommand,
-  getVacancies,
+  getVacantRooms,
   getOptimalVacantRoom,
 };
