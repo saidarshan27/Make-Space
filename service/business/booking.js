@@ -1,4 +1,4 @@
-const { meetingRooms } = require('../repository/meetingRooms');
+const { meetingRooms } = require('../storage/meetingRooms');
 const { getCommandParts, getUTCTimestamp } = require('./util');
 const { getVacancies, getOptimalVacantRoom } = require('./vacany');
 const { validateBookCommand } = require('./validate');
