@@ -1,14 +1,17 @@
-module.exports.meetingRooms = {
-  'C-Cave': {
+module.exports.meetingRooms = [
+  {
+    name:'C-Cave',
     capacity: 3,
     bookings: [],
   },
-  'D-Tower': {
+  {
+    name:'D-Tower',
     capacity: 7,
     bookings: [],
   },
-  'G-Mansion': {
+  {
+    name:'G-Mansion',
     capacity: 20,
     bookings: [],
   },
-};
+];
