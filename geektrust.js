@@ -3,12 +3,16 @@ const { processVacancyCommand } = require('./modules/vacany');
 const { getInput } = require('./modules/util');
 
 const processCommand = (command) => {
-  if (command.includes('BOOK')) {
-    processBookCommand(command);
-  } else if (command.includes('VACANCY')) {
-    processVacancyCommand(command);
-  } else {
-    throw new Error('INCORRECT_INPUT');
+  try {
+    if (command.includes('BOOK')) {
+      processBookCommand(command);
+    } else if (command.includes('VACANCY')) {
+      processVacancyCommand(command);
+    } else {
+      throw new Error('INCORRECT_INPUT');
+    }
+  } catch (e) {
+    console.error(e.message);
   }
 };
 

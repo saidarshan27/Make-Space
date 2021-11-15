@@ -26,12 +26,9 @@ const makeBooking = (command) => {
 };
 
 const processBookCommand = (command) => {
-  try {
-    validateBookCommand(command);
-    console.log(makeBooking(command));
-  } catch (e) {
-    console.error(e.message);
-  }
+  validateBookCommand(command);
+  const bookedRoomName = makeBooking(command);
+  console.log(bookedRoomName);
 };
 
 module.exports = {

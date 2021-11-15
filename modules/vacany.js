@@ -69,12 +69,8 @@ const printVacancies = (command) => {
 };
 
 const processVacancyCommand = (command) => {
-  try {
-    validateVacancyCommand(command);
-    printVacancies(command);
-  } catch (e) {
-    console.error(e.message);
-  }
+  validateVacancyCommand(command);
+  printVacancies(command);
 };
 
 module.exports = {
